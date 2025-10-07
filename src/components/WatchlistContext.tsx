@@ -49,30 +49,41 @@ export const WatchlistProvider: FC<PropsWithChildren> = ({ children }) => {
 		}
 
 		window.localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+	}, [entries]);
 
+	// Supabase-Synchronisation im Hintergrund (debounced)
+	useEffect(() => {
 		if (!isSupabaseConfigured()) {
 			return;
 		}
 
-		const supabase = getSupabaseClient();
-		if (!supabase) {
-			return;
-		}
+		const controller = new AbortController();
+		const timeout = setTimeout(async () => {
+			const supabase = getSupabaseClient();
+			if (!supabase) {
+				return;
+			}
 
-		void supabase
-			.from('watchlist')
-			.upsert(
-				entries.map((entry) => ({
-					card_id: entry.id,
-					payload: entry,
-				})),
-				{ onConflict: 'card_id' },
-			)
-			.then((response) => {
-				if (response.error) {
-					console.error('Supabase-Sync fehlgeschlagen', response.error);
-				}
-			});
+			const { error } = await supabase
+				.from('watchlist')
+				.upsert(
+					entries.map((entry) => ({
+						card_id: entry.id,
+						payload: entry,
+					})),
+					{ onConflict: 'card_id' },
+				)
+				.abortSignal(controller.signal);
+
+			if (error) {
+				console.error('Supabase-Sync fehlgeschlagen', error);
+			}
+		}, 500);
+
+		return () => {
+			controller.abort('component cleanup');
+			clearTimeout(timeout);
+		};
 	}, [entries]);
 
 	const addEntry = useCallback((entry: WatchlistEntry) => {

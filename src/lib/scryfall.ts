@@ -22,6 +22,16 @@ export type ScryfallCard = {
 	};
 	related_uris?: Record<string, string>;
 	scryfall_uri: string;
+	prices?: {
+		usd?: string;
+		usd_foil?: string;
+		eur?: string;
+		eur_foil?: string;
+		usd_etched?: string;
+		tix?: string;
+	};
+	colors?: string[];
+	keywords?: string[];
 };
 
 class ScryfallError extends Error {
@@ -47,6 +57,10 @@ export async function searchCards(query: string): Promise<ScryfallList<ScryfallC
 	return fetchScryfall(`/cards/search?${searchParams.toString()}`);
 }
 
+export async function getCardById(id: string): Promise<ScryfallCard> {
+	return fetchScryfall(`/cards/${id}`);
+}
+
 export async function findSimilarCards(card: ScryfallCard): Promise<ScryfallList<ScryfallCard>> {
 	const filters: string[] = [];
 
@@ -62,18 +76,16 @@ export async function findSimilarCards(card: ScryfallCard): Promise<ScryfallList
 	}
 
 	if (card.keywords && card.keywords.length > 0) {
-		filters.push(card.keywords.slice(0, 3).map((kw) => `keyword:${JSON.stringify(kw.toLowerCase())}`).join(' '));
+		for (const keyword of card.keywords.slice(0, 3)) {
+			filters.push(`keyword:${JSON.stringify(keyword.toLowerCase())}`);
+		}
 	}
 
 	filters.push('-is:extra');
 
-	const query = `${filters.join(' ')} -unique:prints`; // unique reduzieren, aber Varianten zulassen
+	const query = `${filters.join(' ')} -unique:prints`; // Varianten zulassen, Dubletten vermeiden
 
-	return searchCards(`${query}`);
-}
-
-export async function getCardById(id: string): Promise<ScryfallCard> {
-	return fetchScryfall(`/cards/${id}`);
+	return searchCards(query.trim());
 }
 
 export { ScryfallError };
