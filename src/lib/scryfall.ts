@@ -43,8 +43,33 @@ async function fetchScryfall<T>(endpoint: string): Promise<T> {
 }
 
 export async function searchCards(query: string): Promise<ScryfallList<ScryfallCard>> {
-	const searchParams = new URLSearchParams({ q: query });
+	const searchParams = new URLSearchParams({ q: query, include_multilingual: 'true' });
 	return fetchScryfall(`/cards/search?${searchParams.toString()}`);
+}
+
+export async function findSimilarCards(card: ScryfallCard): Promise<ScryfallList<ScryfallCard>> {
+	const filters: string[] = [];
+
+	if (card.colors && card.colors.length > 0) {
+		filters.push(`color>=${card.colors.join('')}`);
+	}
+
+	if (card.type_line) {
+		const mainType = card.type_line.split('—')[0]?.trim();
+		if (mainType) {
+			filters.push(`type:${JSON.stringify(mainType.toLowerCase())}`);
+		}
+	}
+
+	if (card.keywords && card.keywords.length > 0) {
+		filters.push(card.keywords.slice(0, 3).map((kw) => `keyword:${JSON.stringify(kw.toLowerCase())}`).join(' '));
+	}
+
+	filters.push('-is:extra');
+
+	const query = `${filters.join(' ')} -unique:prints`; // unique reduzieren, aber Varianten zulassen
+
+	return searchCards(`${query}`);
 }
 
 export async function getCardById(id: string): Promise<ScryfallCard> {

@@ -1,5 +1,6 @@
 ---
 import Hello from '../components/Hello';
+import WatchlistApp from '../components/WatchlistApp';
 ---
 
 <html lang="de">
@@ -11,10 +12,16 @@ import Hello from '../components/Hello';
 		<title>MTG Explorer</title>
 	</head>
 	<body>
-		<Hello client:load message="Willkommen beim MTG Explorer" />
-		<p>
-			Entdecke unsere erste Kartenliste mit Daten direkt von der Scryfall-API.
-			<a href="/cards">Zur Kartenliste</a>
-		</p>
+		<main class="layout">
+			<section class="intro">
+				<Hello client:load message="Willkommen beim MTG Explorer" />
+				<p>
+					Suche nach Karten, füge sie deiner Watchlist hinzu und verwalte Alerts – alles in einer Oberfläche.
+				</p>
+			</section>
+			<section class="workspace">
+				<WatchlistApp client:load />
+			</section>
+		</main>
 	</body>
 </html>

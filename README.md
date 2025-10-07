@@ -4,9 +4,9 @@ Ein Astro-Projekt (React + TypeScript) als Grundlage für eine GitHub-Pages-Webs
 
 ## Voraussetzungen
 
-- Docker (läuft bereits)
-- [DDEV](https://ddev.readthedocs.io)
+- Docker + [DDEV](https://ddev.readthedocs.io)
 - Node/npm innerhalb des DDEV-Containers (`ddev npm ...`)
+- Optional: Supabase-Projekt für Persistenz/Alerts (`PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_ANON_KEY`)
 
 ## Projektstruktur
 
@@ -16,13 +16,22 @@ Ein Astro-Projekt (React + TypeScript) als Grundlage für eine GitHub-Pages-Webs
 ├── public/
 ├── src/
 │   ├── components/
-│   │   ├── CardList.tsx
-│   │   └── Hello.tsx
+│   │   ├── CardSearch.tsx
+│   │   ├── SimilarCardsDrawer.tsx
+│   │   ├── Watchlist.tsx
+│   │   ├── WatchlistApp.tsx
+│   │   └── WatchlistShell.tsx
 │   ├── lib/
-│   │   └── scryfall.ts
-│   └── pages/
-│       ├── index.astro
-│       └── cards.astro
+│   │   ├── scryfall.ts
+│   │   └── supabaseClient.ts
+│   ├── pages/
+│   │   ├── index.astro
+│   │   └── cards.astro
+│   └── utils/
+│       └── formatPrice.ts
+├── supabase/
+│   └── edge-functions/check-price/
+│       └── index.ts
 ├── astro.config.mjs
 ├── package.json
 └── tsconfig.json
@@ -32,15 +41,23 @@ Ein Astro-Projekt (React + TypeScript) als Grundlage für eine GitHub-Pages-Webs
 
 ```
 ddev npm install
-ddev npm run dev
+ddev npm run dev -- --host 0.0.0.0
 ```
 
-- Startseite: `https://mtg.ddev.site`
-- Kartenliste (Scryfall-Demo): `https://mtg.ddev.site/cards`
+- Devserver erreichbar unter `http://mtg.ddev.site:4321`
+- Kartenliste (Scryfall-Demo): `http://mtg.ddev.site:4321/cards`
 
-## Scryfall-Datenzugriff
+## Funktionen
 
-`src/lib/scryfall.ts` kapselt die API-Abfragen (Suche, Einzelkarten). Die Beispielseite `src/pages/cards.astro` lädt Karten mit der Query `lightning bolt` und demonstriert Lade-/Fehlerzustände.
+- Suche nach Karten via Scryfall, Watchlist mit LocalStorage + optionaler Supabase-Synchronisation.
+- Similar-Cards-Drawer: Vorschläge anhand Farbe/Typ/Keywords, direkt zur Watchlist hinzufügbar.
+- Platzhalter für Preisalarme (`supabase/edge-functions/check-price`), Supabase-Konfiguration erforderlich.
+
+## Supabase Setup (optional)
+
+1. Supabase-Projekt erstellen, Tabelle `watchlist` anlegen (`card_id text primary key`, `payload jsonb`).
+2. Edge Function `check-price` deployen (logik noch Platzhalter).
+3. Env-Variablen setzen: `PUBLIC_SUPABASE_URL`, `PUBLIC_SUPABASE_ANON_KEY`.
 
 ## Build & Preview
 
