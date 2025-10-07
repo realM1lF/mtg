@@ -1,13 +1,18 @@
+import { useEffect, useState } from 'react';
 import CardSearch from './CardSearch';
 import Watchlist from './Watchlist';
 import { useWatchlist } from './WatchlistContext';
 import type { ScryfallCard } from '../lib/scryfall';
+import type { PriceAlert } from '../lib/priceAlerts';
+import { loadPriceAlerts } from '../lib/priceAlerts';
 
 type WatchlistShellProps = {
 	onFindSimilar: (card: ScryfallCard) => void;
+	onPriceAlert: (card: ScryfallCard) => void;
+	alerts: PriceAlert[];
 };
 
-const WatchlistShell = ({ onFindSimilar }: WatchlistShellProps) => {
+const WatchlistShell = ({ onFindSimilar, onPriceAlert, alerts }: WatchlistShellProps) => {
 	const { entries, addEntry, removeEntry } = useWatchlist();
 
 	return (
@@ -15,8 +20,9 @@ const WatchlistShell = ({ onFindSimilar }: WatchlistShellProps) => {
 			<CardSearch onSelect={addEntry} />
 			<Watchlist
 				cards={entries}
+				alerts={alerts}
 				onRemove={removeEntry}
-				onPriceAlert={(card) => console.log('Preisalarm für', card.name)}
+				onPriceAlert={onPriceAlert}
 				onFindSimilar={onFindSimilar}
 			/>
 		</div>
