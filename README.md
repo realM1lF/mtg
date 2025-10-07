@@ -15,8 +15,14 @@ Ein Astro-Projekt (React + TypeScript) als Grundlage für eine GitHub-Pages-Webs
 ├── .ddev/
 ├── public/
 ├── src/
+│   ├── components/
+│   │   ├── CardList.tsx
+│   │   └── Hello.tsx
+│   ├── lib/
+│   │   └── scryfall.ts
 │   └── pages/
-│       └── index.astro
+│       ├── index.astro
+│       └── cards.astro
 ├── astro.config.mjs
 ├── package.json
 └── tsconfig.json
@@ -29,7 +35,12 @@ ddev npm install
 ddev npm run dev
 ```
 
-Anschließend steht die Seite unter `https://mtg.ddev.site` zur Verfügung.
+- Startseite: `https://mtg.ddev.site`
+- Kartenliste (Scryfall-Demo): `https://mtg.ddev.site/cards`
+
+## Scryfall-Datenzugriff
+
+`src/lib/scryfall.ts` kapselt die API-Abfragen (Suche, Einzelkarten). Die Beispielseite `src/pages/cards.astro` lädt Karten mit der Query `lightning bolt` und demonstriert Lade-/Fehlerzustände.
 
 ## Build & Preview
 

@@ -1,0 +1,19 @@
+---
+import CardList from '../components/CardList';
+---
+
+<html lang="de">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<title>MTG Explorer | Karten</title>
+	</head>
+	<body>
+		<h1>Beispiel-Kartenliste</h1>
+		<p>
+			Die folgende Liste lädt Karten mit der Suchphrase
+			<code>lightning bolt</code> direkt von der Scryfall-API.
+		</p>
+		<CardList client:load query="lightning bolt" />
+	</body>
+</html>
